@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#0e0e13] text-[#e4e1e9] overflow-x-hidden;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  .text-gradient {
+    background: linear-gradient(90deg, #00dbe9 0%, #883ca6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .portal-button {
+    position: relative;
+    background: linear-gradient(135deg, #6e208c 0%, #00dbe9 100%);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+  
+  .portal-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
+    transform: translate(-100%, -100%);
+    transition: transform 0.6s ease;
+  }
+  
+  .portal-button:hover::before {
+    transform: translate(0, 0);
+  }
+  
+  .portal-button:hover {
+    box-shadow: 0 0 50px rgba(0, 219, 233, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.3);
+    transform: scale(1.05) translateY(-2px);
+  }
+  
+  .hero-3d-sphere {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle at 30% 30%, #00dbe9 0%, #6e208c 50%, #131318 100%);
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.2;
+    animation: float 10s ease-in-out infinite alternate;
+  }
+  
+  .scanline {
+    width: 100%;
+    height: 2px;
+    background: rgba(0, 219, 233, 0.1);
+    position: absolute;
+    animation: scan 4s linear infinite;
+    z-index: 20;
+    pointer-events: none;
+  }
+  
+  .reveal-text {
+    animation: reveal 1s cubic-bezier(0.77, 0, 0.175, 1);
+  }
+  
+  .grid-bg {
+    background-image: 
+        linear-gradient(rgba(0, 219, 233, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 219, 233, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    perspective: 1000px;
+    transform: rotateX(60deg);
+    position: absolute;
+    bottom: -20%;
+    left: -50%;
+    right: -50%;
+    height: 100%;
+    z-index: 0;
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+  }
+}
+
+@keyframes float {
+  0% { transform: translate(-10%, -10%) rotate(0deg) scale(1); }
+  100% { transform: translate(10%, 10%) rotate(180deg) scale(1.2); }
+}
+
+@keyframes scan {
+  0% { top: 0%; }
+  100% { top: 100%; }
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
