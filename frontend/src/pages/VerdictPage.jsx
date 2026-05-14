@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { judgeDebate } from '../AIEngine';
 import { useAuth } from '../context/AuthContext';
 import Footer from '../components/Footer';
+import API_BASE_URL from '../api';
 
 export default function VerdictPage() {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ export default function VerdictPage() {
         // Auto-save to database (once only for new debates)
         if (!hasSaved.current) {
           hasSaved.current = true;
-          await fetch('http://localhost:5000/api/debates/save', {
+          await fetch(`${API_BASE_URL}/api/debates/save`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

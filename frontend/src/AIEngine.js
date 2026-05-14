@@ -1,6 +1,8 @@
+import API_BASE_URL from './api';
+
 export const generateAIResponse = async (topic, role, mode, roundNum, opponentLastMessage, depth, arenaMode) => {
   try {
-    const response = await fetch('http://localhost:5000/api/debate', {
+    const response = await fetch(`${API_BASE_URL}/api/debate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -50,7 +52,7 @@ export const generateAIResponse = async (topic, role, mode, roundNum, opponentLa
 
 export const judgeDebate = async (topic, proArgs, conArgs) => {
   try {
-    const response = await fetch('http://localhost:5000/api/judge', {
+    const response = await fetch(`${API_BASE_URL}/api/judge`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topic, proArgs, conArgs }),

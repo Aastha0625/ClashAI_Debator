@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
+import API_BASE_URL from '../api';
 
 export default function HistoryPage() {
   const [history, setHistory] = useState([]);
@@ -12,7 +13,7 @@ export default function HistoryPage() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/debates/history?userId=${user?.userId || ''}`);
+        const res = await fetch(`${API_BASE_URL}/api/debates/history?userId=${user?.userId || ''}`);
         const data = await res.json();
         setHistory(data);
       } catch (err) {
@@ -30,7 +31,7 @@ export default function HistoryPage() {
 
     try {
       console.log(`Attempting to delete debate ID: ${id}`);
-      const res = await fetch(`http://localhost:5000/api/debates/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/debates/${id}`, {
         method: 'DELETE',
       });
       if (res.ok) {

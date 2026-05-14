@@ -31,7 +31,7 @@ Persistent storage of all debate sessions, allowing for longitudinal re-examinat
 
 - **Frontend**: React.js with a glassmorphic design system.
 - **Backend**: Node.js and Express.js.
-- **Persistence**: SQLite relational database.
+- **Persistence**: Supabase (PostgreSQL) cloud database.
 - **Inference**: Groq Cloud SDK (Llama 3.3 70B & 8B).
 - **Authentication**: JWT-secured session management.
 
@@ -40,6 +40,7 @@ Persistent storage of all debate sessions, allowing for longitudinal re-examinat
 ### System Requirements
 - Node.js (v18.0.0 or higher)
 - Groq Cloud API Credentials
+- Supabase Project Credentials
 
 ### Setup Procedure
 
@@ -59,6 +60,8 @@ Persistent storage of all debate sessions, allowing for longitudinal re-examinat
    GROQ_API_KEY=your_api_key
    JWT_SECRET=your_secure_secret
    PORT=5000
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_KEY=your_supabase_anon_key
    ```
    Initialize the server:
    ```bash

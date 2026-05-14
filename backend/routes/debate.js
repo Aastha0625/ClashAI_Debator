@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../database');
+const supabase = require('../supabase');
 const { generateResponse, judgeDebate } = require('../services/aiService');
 
 // AI Response Generation
@@ -24,41 +24,61 @@ router.post('/judge', async (req, res) => {
 });
 
 // Save Debate History
-router.post('/debates/save', (req, res) => {
+router.post('/debates/save', async (req, res) => {
   const { userId, topic, mode, rounds, proArgs, conArgs, verdict } = req.body;
-  db.run(`
-    INSERT INTO debates (user_id, topic, mode, rounds, pro_args, con_args, verdict)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `, [
-    userId || null, topic, mode, rounds, 
-    JSON.stringify(proArgs), JSON.stringify(conArgs), JSON.stringify(verdict)
-  ], function(err) {
-    if (err) return res.status(500).json({ error: "Failed to save." });
+  try {
+    const { error } = await supabase
+      .from('debates')
+      .insert([
+        { 
+          user_id: userId || null, 
+          topic, 
+          mode, 
+          rounds, 
+          pro_args: proArgs, 
+          con_args: conArgs, 
+          verdict: verdict 
+        }
+      ]);
+
+    if (error) throw error;
     res.json({ success: true });
-  });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to save." });
+  }
 });
 
 // Get Debate History
-router.get('/debates/history', (req, res) => {
+router.get('/debates/history', async (req, res) => {
   const userId = req.query.userId;
-  db.all('SELECT * FROM debates WHERE user_id = ? OR user_id IS NULL ORDER BY created_at DESC', [userId], (err, rows) => {
-    if (err) return res.status(500).json({ error: "Database error." });
-    res.json(rows.map(d => ({
-      ...d,
-      pro_args: JSON.parse(d.pro_args),
-      con_args: JSON.parse(d.con_args),
-      verdict: JSON.parse(d.verdict)
-    })));
-  });
+  try {
+    const { data, error } = await supabase
+      .from('debates')
+      .select('*')
+      .or(`user_id.eq.${userId},user_id.is.null`)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Database error." });
+  }
 });
 
 // Delete Debate History
-router.delete('/debates/:id', (req, res) => {
+router.delete('/debates/:id', async (req, res) => {
   const { id } = req.params;
-  db.run('DELETE FROM debates WHERE id = ?', [id], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ success: true, changes: this.changes });
-  });
+  try {
+    const { error } = await supabase
+      .from('debates')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;
