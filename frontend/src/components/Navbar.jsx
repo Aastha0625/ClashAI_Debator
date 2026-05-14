@@ -40,7 +40,7 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-8">
           <Link to="/setup" className={`font-body-md ${location.pathname === '/setup' ? 'text-primary-fixed-dim border-b-2 border-primary-fixed-dim pb-1' : 'text-[#b9cacb] hover:text-white transition-colors'}`}>Arena</Link>
           <Link to="/history" className={`font-body-md ${location.pathname === '/history' ? 'text-primary-fixed-dim border-b-2 border-primary-fixed-dim pb-1' : 'text-[#b9cacb] hover:text-white transition-colors'}`}>Archives</Link>
-          <a className="font-body-md text-[#b9cacb] hover:text-white transition-colors" href="https://github.com" target="_blank" rel="noreferrer">Docs</a>
+          <a className="font-body-md text-[#b9cacb] hover:text-white transition-colors" href="https://github.com/Aastha0625/ClashAI_Debator" target="_blank" rel="noreferrer">Docs</a>
         </nav>
 
         <div className="flex items-center gap-4">
