@@ -10,37 +10,50 @@ export default function VerdictPage() {
   const [loading, setLoading] = useState(true);
   const [verdict, setVerdict] = useState(null);
 
-  const { topic, proArgs, conArgs } = location.state || { 
-    topic: "Unknown Topic", 
+  const { topic, proArgs, conArgs } = location.state || {
+    topic: "Unknown Topic",
     proArgs: [],
     conArgs: []
   };
 
   const { user } = useAuth();
+  const hasSaved = React.useRef(false);
 
   useEffect(() => {
-    const getVerdict = async () => {
-      const result = await judgeDebate(topic, proArgs, conArgs);
-      setVerdict(result);
+    // If we already have a verdict in state (from Archives), use it directly
+    if (location.state?.verdict) {
+      setVerdict(location.state.verdict);
       setLoading(false);
+      hasSaved.current = true; // Mark as saved so we don't duplicate
+      return;
+    }
 
-      // Auto-save to database
+    const getVerdict = async () => {
       try {
-        await fetch('http://localhost:5000/api/debates/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: user?.userId,
-            topic,
-            mode: location.state?.mode,
-            rounds: location.state?.rounds,
-            proArgs,
-            conArgs,
-            verdict: result
-          })
-        });
+        const result = await judgeDebate(topic, proArgs, conArgs);
+        setVerdict(result);
+        setLoading(false);
+
+        // Auto-save to database (once only for new debates)
+        if (!hasSaved.current) {
+          hasSaved.current = true;
+          await fetch('http://localhost:5000/api/debates/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: user?.userId,
+              topic,
+              mode: location.state?.mode,
+              rounds: location.state?.rounds,
+              proArgs,
+              conArgs,
+              verdict: result
+            })
+          });
+        }
       } catch (err) {
-        console.error("Auto-save failed:", err);
+        console.error("Judging or saving failed:", err);
+        setLoading(false); // Stop loading even if it fails
       }
     };
     getVerdict();
@@ -51,7 +64,6 @@ export default function VerdictPage() {
       <div className="bg-[#131318] min-h-screen flex flex-col items-center justify-center text-white">
         <div className="w-20 h-20 rounded-full border-4 border-primary-fixed-dim border-t-transparent animate-spin mb-8 shadow-[0_0_30px_rgba(0,219,233,0.3)]"></div>
         <h2 className="font-display-lg text-2xl font-bold tracking-widest animate-pulse">ANALYZING LOGIC CLUSTERS...</h2>
-        <p className="font-data-mono text-sm text-[#b9cacb] mt-4">GROQ-LLAMA-3.3 NEURAL ARBITRATION IN PROGRESS</p>
       </div>
     );
   }
@@ -61,10 +73,10 @@ export default function VerdictPage() {
   const proScore = verdict.proScore;
   const conScore = verdict.conScore;
   const margin = Math.abs(((proScore - conScore) / ((proScore + conScore) / 2)) * 100).toFixed(1);
-  
+
   const handleShare = () => {
     const shareText = `ClashAI Debate Verdict 🛡️⚡\n\nTopic: "${topic}"\nWinner: ${winnerName} (${(isProWinner ? proScore : conScore).toFixed(0)}% Coherence)\n\nReasoning: "${verdict.reasoning}"\n\nAnalyze your own logic at ClashAI.`;
-    
+
     if (navigator.share) {
       navigator.share({
         title: 'ClashAI Debate Verdict',
@@ -81,7 +93,7 @@ export default function VerdictPage() {
   return (
     <div className="bg-[#131318] text-[#e4e1e9] font-body-md min-h-screen pb-32 md:pb-0 relative overflow-hidden">
       {/* Background Decoration */}
-      <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0" style={{background: 'radial-gradient(circle at top, #1b1b20 0%, #131318 100%)'}}>
+      <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0" style={{ background: 'radial-gradient(circle at top, #1b1b20 0%, #131318 100%)' }}>
         <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary-fixed-dim/5 blur-[120px] rounded-full"></div>
         <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-secondary/5 blur-[120px] rounded-full"></div>
       </div>
@@ -92,7 +104,7 @@ export default function VerdictPage() {
           <div className="text-center mb-20">
             <h2 className="font-label-caps text-primary-fixed-dim tracking-[0.2em] mb-2 font-bold text-[12px]">POST-CONFLICT ANALYSIS</h2>
             <h1 className="font-display-lg text-[32px] md:text-[48px] font-bold mb-8 text-white">The Logic Verdict</h1>
-            
+
             {/* Winner Banner */}
             <div className="relative mt-8 inline-block w-full max-w-4xl">
               <div className={`absolute inset-0 ${isProWinner ? 'bg-primary-fixed-dim/20' : 'bg-secondary/20'} blur-[80px] rounded-full`}></div>
@@ -113,22 +125,22 @@ export default function VerdictPage() {
               <h3 className="font-headline-md text-[24px] font-semibold text-white">Winning Strategy</h3>
               <div className={`border ${isProWinner ? 'border-primary-fixed-dim/40 text-primary-fixed-dim' : 'border-secondary/40 text-secondary'} px-4 py-1 rounded-full font-data-mono text-[12px]`}>{winnerName} Verdict</div>
             </div>
-            
+
             <div className={`glass-panel rounded-xl p-8 border ${isProWinner ? 'border-primary-fixed-dim/40' : 'border-secondary/40'} flex items-center gap-8 relative overflow-hidden`}>
-               <div className={`absolute top-0 left-0 w-1 h-full ${isProWinner ? 'bg-primary-fixed-dim' : 'bg-secondary'}`}></div>
-               <div className="flex-1 pr-8 border-r border-white/10">
-                 <div className="font-label-caps text-[12px] text-[#b9cacb] mb-4 font-bold tracking-widest">WHY THEY WON</div>
-                 <p className="font-body-md text-white italic">
-                   "{verdict.reasoning}"
-                 </p>
-               </div>
-               <div className="w-32 h-32 rounded-full border-4 border-white/10 flex items-center justify-center relative flex-shrink-0">
-                  <div className={`absolute inset-0 rounded-full border-4 ${isProWinner ? 'border-primary-fixed-dim' : 'border-secondary'} border-r-transparent border-t-transparent rotate-45`}></div>
-                  <div className="text-center">
-                    <div className="text-[32px] font-display-lg font-bold text-white leading-none">{(isProWinner ? proScore : conScore).toFixed(0)}%</div>
-                    <div className="text-[8px] font-label-caps text-[#b9cacb] tracking-widest mt-1">COHERENCE</div>
-                  </div>
-               </div>
+              <div className={`absolute top-0 left-0 w-1 h-full ${isProWinner ? 'bg-primary-fixed-dim' : 'bg-secondary'}`}></div>
+              <div className="flex-1 pr-8 border-r border-white/10">
+                <div className="font-label-caps text-[12px] text-[#b9cacb] mb-4 font-bold tracking-widest">WHY THEY WON</div>
+                <p className="font-body-md text-white italic">
+                  "{verdict.reasoning}"
+                </p>
+              </div>
+              <div className="w-32 h-32 rounded-full border-4 border-white/10 flex items-center justify-center relative flex-shrink-0">
+                <div className={`absolute inset-0 rounded-full border-4 ${isProWinner ? 'border-primary-fixed-dim' : 'border-secondary'} border-r-transparent border-t-transparent rotate-45`}></div>
+                <div className="text-center">
+                  <div className="text-[32px] font-display-lg font-bold text-white leading-none">{(isProWinner ? proScore : conScore).toFixed(0)}%</div>
+                  <div className="text-[8px] font-label-caps text-[#b9cacb] tracking-widest mt-1">COHERENCE</div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -166,7 +178,7 @@ export default function VerdictPage() {
                 <div className="font-display-lg text-[32px] font-bold text-white">{verdict.factDepth}<span className="text-[20px] text-[#b9cacb]">/10</span></div>
               </div>
               <div className="mt-8">
-                 <div className="flex justify-between font-data-mono text-[10px] text-[#b9cacb] mb-2">
+                <div className="flex justify-between font-data-mono text-[10px] text-[#b9cacb] mb-2">
                   <span>Detail Level</span>
                   <span>{verdict.factDepth > 7 ? 'High' : 'Normal'}</span>
                 </div>
@@ -188,7 +200,7 @@ export default function VerdictPage() {
                 <div className="font-display-lg text-[32px] font-bold text-white">{verdict.impactScore}</div>
               </div>
               <div className="mt-8">
-                 <div className="flex justify-between font-data-mono text-[10px] text-[#b9cacb] mb-2 uppercase">
+                <div className="flex justify-between font-data-mono text-[10px] text-[#b9cacb] mb-2 uppercase">
                   <span>Impact</span>
                   <span>Solid</span>
                 </div>
@@ -201,14 +213,14 @@ export default function VerdictPage() {
 
           {/* Action Buttons */}
           <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-20 max-w-4xl mx-auto">
-            <button 
+            <button
               className="w-full md:w-auto px-12 py-4 bg-primary-fixed-dim text-[#002022] font-label-caps text-[14px] font-bold rounded-xl hover:scale-95 active:scale-90 transition-transform shadow-[0_0_20px_rgba(0,219,233,0.3)] flex items-center justify-center gap-2"
               onClick={() => navigate('/setup')}
             >
               <span className="material-symbols-outlined text-[20px]">refresh</span>
               New Debate
             </button>
-            <button 
+            <button
               className="w-full md:w-auto px-12 py-4 glass-panel text-white font-label-caps text-[14px] font-bold rounded-xl hover:bg-white/10 hover:scale-95 active:scale-90 transition-all border border-white/20 flex items-center justify-center gap-2"
               onClick={handleShare}
             >

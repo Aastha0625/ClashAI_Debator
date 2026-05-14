@@ -41,6 +41,7 @@ export default function ArenaPage() {
   const [conScore, setConScore] = useState(0);
   
   const [isTyping, setIsTyping] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
 
   const proScrollRef = useRef(null);
   const conScrollRef = useRef(null);
@@ -61,6 +62,7 @@ export default function ArenaPage() {
   const startDebate = () => {
     if (!topic.trim()) return;
     setIsDebating(true);
+    setIsComplete(false);
     setCurrentRound(1);
     setProArgs([]);
     setConArgs([]);
@@ -117,8 +119,8 @@ export default function ArenaPage() {
         setTimeout(() => {
           setIsDebating(false);
           setActiveDebater(null);
-          navigate('/verdict', { state: { topic, mode, rounds, proScore, conScore, proArgs, conArgs, depth, arenaMode } });
-        }, 3000);
+          setIsComplete(true);
+        }, 1000);
       }
     }
   };
@@ -133,10 +135,10 @@ export default function ArenaPage() {
 
       <main className="pt-[120px] pb-section-gap px-margin-edge max-w-container-max mx-auto">
         {/* Hero / Setup Section */}
-        <section className="flex flex-col items-center text-center mb-section-gap">
-          <p className="font-body-md text-on-surface-variant mb-stack-lg max-w-xl">Set the parameters and watch the clash of logic. Two advanced neural networks dissect complexity through adversarial reasoning.</p>
+        <section className="flex flex-col items-center text-center mb-8">
+          <p className="font-body-md text-on-surface-variant mb-4 max-w-xl">Set the parameters and watch the clash of logic. Two advanced neural networks dissect complexity through adversarial reasoning.</p>
           
-          <div className="w-full max-w-4xl space-y-stack-md">
+          <div className="w-full max-w-4xl space-y-4">
             {/* Input Group */}
             <div className="flex flex-col md:flex-row gap-stack-md">
               <div className="relative flex-grow group">
@@ -170,11 +172,11 @@ export default function ArenaPage() {
             </div>
             
             {/* Parameters Bar */}
-            <div className="glass-panel w-full p-4 rounded-xl flex flex-wrap items-center justify-center gap-10 md:gap-20">
+            <div className="glass-panel w-full p-4 rounded-xl flex flex-wrap items-center justify-center gap-x-12 gap-y-3">
               <div className="flex items-center gap-4">
-                <span className="font-label-caps text-label-caps text-on-surface-variant">ROUNDS:</span>
+                <span className="font-label-caps text-[10px] md:text-label-caps text-on-surface-variant">ROUNDS:</span>
                 <select 
-                  className="bg-surface-container-high border-none text-on-surface rounded-lg px-4 py-1 font-body-md focus:ring-1 focus:ring-primary-fixed-dim"
+                  className="bg-surface-container-high border-none text-on-surface rounded-lg px-4 py-1 font-body-md focus:ring-1 focus:ring-primary-fixed-dim text-sm"
                   value={rounds}
                   onChange={(e) => setRounds(Number(e.target.value))}
                   disabled={isDebating}
@@ -185,12 +187,12 @@ export default function ArenaPage() {
                 </select>
               </div>
               <div className="flex items-center gap-4">
-                <span className="font-label-caps text-label-caps text-on-surface-variant">PERSONALITY MODE:</span>
+                <span className="font-label-caps text-[10px] md:text-label-caps text-on-surface-variant">PERSONALITY:</span>
                 <div className="bg-surface-container-high p-1 rounded-lg flex gap-1">
                   {['NORMAL', 'SAVAGE', 'PHILOSOPHER'].map(m => (
                     <button 
                       key={m}
-                      className={`${mode === m ? 'bg-white/10 text-on-surface' : 'hover:bg-white/5 text-on-surface-variant'} px-4 py-1 rounded-md text-label-caps font-label-caps transition-colors`}
+                      className={`${mode === m ? 'bg-white/10 text-on-surface' : 'hover:bg-white/5 text-on-surface-variant'} px-3 py-1 rounded-md text-[10px] md:text-label-caps font-label-caps transition-colors`}
                       onClick={() => setMode(m)}
                       disabled={isDebating}
                     >
@@ -200,12 +202,12 @@ export default function ArenaPage() {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <span className="font-label-caps text-label-caps text-on-surface-variant">DEPTH:</span>
-                <span className="font-data-mono text-primary-fixed-dim">LEVEL {depth}</span>
+                <span className="font-label-caps text-[10px] md:text-label-caps text-on-surface-variant">DEPTH:</span>
+                <span className="font-data-mono text-primary-fixed-dim text-sm">LVL {depth}</span>
               </div>
               <div className="flex items-center gap-4">
-                <span className="font-label-caps text-label-caps text-on-surface-variant">ARENA:</span>
-                <span className="font-data-mono text-secondary">{arenaMode}</span>
+                <span className="font-label-caps text-[10px] md:text-label-caps text-on-surface-variant">ARENA:</span>
+                <span className="font-data-mono text-secondary text-sm">{arenaMode}</span>
               </div>
             </div>
           </div>
@@ -214,7 +216,7 @@ export default function ArenaPage() {
         {/* Battle Stage */}
         <section className="relative">
           {/* Round Indicator */}
-          <div className="flex flex-col items-center mb-stack-lg">
+          <div className="flex flex-col items-center mb-4">
             <h2 className="font-label-caps text-label-caps text-on-surface-variant tracking-widest mb-4">ROUND {currentRound} / {rounds}</h2>
             <div className="flex gap-2">
               {Array.from({ length: rounds }).map((_, i) => (
@@ -227,7 +229,7 @@ export default function ArenaPage() {
           </div>
 
           {/* Main Arena Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-11 items-stretch gap-stack-md lg:gap-gutter relative">
+          <div className="grid grid-cols-1 md:grid-cols-11 items-stretch gap-stack-md lg:gap-gutter relative mb-8">
             
             {/* Pro Side: Advocate */}
             <div className={`md:col-span-5 glass-panel rounded-2xl p-stack-lg flex flex-col min-h-[400px] ${activeDebater === 'pro' ? 'border border-[rgba(0,219,233,0.4)] shadow-[0_0_20px_rgba(0,219,233,0.1)]' : ''}`}>
@@ -319,6 +321,19 @@ export default function ArenaPage() {
             </div>
 
           </div>
+
+          {/* Show Verdict Button (Gated) */}
+          {isComplete && (
+            <div className="flex justify-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <button 
+                className="portal-button px-16 py-6 rounded-2xl text-white font-label-caps text-lg flex items-center gap-4 group shadow-[0_0_50px_rgba(0,219,233,0.4)] hover:shadow-[0_0_70px_rgba(0,219,233,0.6)] transition-all"
+                onClick={() => navigate('/verdict', { state: { topic, mode, rounds, proScore, conScore, proArgs, conArgs, depth, arenaMode } })}
+              >
+                <span className="material-symbols-outlined text-3xl group-hover:scale-125 transition-transform">gavel</span>
+                <span className="tracking-[0.2em] font-black italic">EXTRACT NEURAL VERDICT</span>
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Side-by-Side Context / Rules (Bento Style) */}
