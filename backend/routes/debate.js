@@ -52,15 +52,23 @@ router.post('/debates/save', async (req, res) => {
 router.get('/debates/history', async (req, res) => {
   const userId = req.query.userId;
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('debates')
       .select('*')
-      .or(`user_id.eq.${userId},user_id.is.null`)
       .order('created_at', { ascending: false });
 
+    if (userId && userId !== 'undefined' && userId !== '') {
+      query = query.or(`user_id.eq.${userId},user_id.is.null`);
+    } else {
+      query = query.is('user_id', null);
+    }
+
+    const { data, error } = await query;
+
     if (error) throw error;
-    res.json(data);
+    res.json(data || []);
   } catch (err) {
+    console.error("History error:", err);
     res.status(500).json({ error: "Database error." });
   }
 });

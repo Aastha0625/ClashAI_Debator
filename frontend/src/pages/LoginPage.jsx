@@ -20,7 +20,7 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        login(data.token, data.username);
+        login(data.token, data.username, data.userId);
         navigate('/');
       } else {
         setError(data.error);

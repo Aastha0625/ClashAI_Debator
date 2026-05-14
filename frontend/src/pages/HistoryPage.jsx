@@ -15,9 +15,15 @@ export default function HistoryPage() {
       try {
         const res = await fetch(`${API_BASE_URL}/api/debates/history?userId=${user?.userId || ''}`);
         const data = await res.json();
-        setHistory(data);
+        if (Array.isArray(data)) {
+          setHistory(data);
+        } else {
+          setHistory([]);
+          console.error("Server returned non-array data:", data);
+        }
       } catch (err) {
         console.error("History fetch failed:", err);
+        setHistory([]);
       } finally {
         setLoading(false);
       }
