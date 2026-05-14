@@ -58,8 +58,10 @@ router.get('/debates/history', async (req, res) => {
       .order('created_at', { ascending: false });
 
     if (userId && userId !== 'undefined' && userId !== '') {
-      query = query.or(`user_id.eq.${userId},user_id.is.null`);
+      query = query.eq('user_id', userId);
     } else {
+      // If no userId, return empty or only public/null debates. 
+      // For now, keeping it consistent: guests see anonymous debates.
       query = query.is('user_id', null);
     }
 
