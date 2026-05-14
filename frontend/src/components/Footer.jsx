@@ -1,10 +1,11 @@
 import React from 'react';
+import logo from '../assets/clash_logo.png';
 
 export default function Footer() {
   return (
     <footer className="w-full py-4 px-margin-edge flex flex-col md:flex-row justify-between items-center gap-4 border-t border-white/5 bg-background/50 backdrop-blur-sm">
       <div className="flex items-center gap-3">
-        <img src="/src/assets/clash_logo.png" alt="ClashAI" className="w-8 h-8 object-contain" />
+        <img src={logo} alt="ClashAI" className="w-8 h-8 object-contain" />
         <span className="font-display-lg text-lg font-black text-white tracking-widest uppercase">ClashAI</span>
         <span className="text-[#849495] font-data-mono text-[10px]">© 2026</span>
       </div>

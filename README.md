@@ -51,6 +51,7 @@ Persistent storage of all debate sessions, allowing for longitudinal re-examinat
    ```
 
 2. **Backend Configuration**
+   URL : https://clashai-debator.onrender.com
    ```bash
    cd backend
    npm install
@@ -69,6 +70,7 @@ Persistent storage of all debate sessions, allowing for longitudinal re-examinat
    ```
 
 3. **Frontend Initialization**
+   URL : https://clash-ai-debator.vercel.app/
    ```bash
    cd ../frontend
    npm install

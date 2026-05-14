@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
+import logo from '../assets/clash_logo.png';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export default function Navbar() {
     <>
       <header className={headerClass}>
         <div className={`font-display-lg font-black tracking-widest text-white flex items-center gap-3 ${isLandingPage ? 'text-2xl md:text-3xl' : 'text-xl md:text-2xl'}`}>
-          <img src="/src/assets/clash_logo.png" alt="ClashAI Logo" className="w-10 h-10 object-contain" />
+          <img src={logo} alt="ClashAI Logo" className="w-10 h-10 object-contain" />
           <Link to="/">ClashAI</Link>
         </div>
 
