@@ -64,7 +64,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="bg-[#131318] text-[#e4e1e9] min-h-screen pt-32 pb-8 px-4 md:px-8 flex flex-col">
+    <div className="bg-[#131318] text-[#e4e1e9] min-h-screen pt-32 pb-0 px-4 md:px-8 flex flex-col">
       <div className="max-w-4xl mx-auto w-full flex-1">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <h1 className="font-display-lg text-[32px] md:text-[48px] font-bold text-white">Neural Archives</h1>
